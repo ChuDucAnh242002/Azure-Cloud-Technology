@@ -1,0 +1,59 @@
+---
+# Source: evershop/templates/evershop.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: evershop
+  namespace: "default"
+  labels:
+    app: evershop
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: http
+      port: 3000
+  selector:
+    app.kubernetes.io/name: evershop
+    app-type: evershop
+---
+# Source: evershop/templates/evershop.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: "default"
+  name: evershop
+  labels:
+    app-type: evershop
+    app.kubernetes.io/name: evershop
+spec:
+  selector:
+    matchLabels:
+      app-type: evershop
+      app.kubernetes.io/name: evershop
+  template:
+    metadata:
+      labels:
+        app-type: evershop
+        app.kubernetes.io/name: evershop
+    spec:
+      containers:
+        - name: back
+          image: "evershop/evershop:latest"
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 50m
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DB_NAME
+              value: "evershop_db"
+            - name: DB_USER
+              value: "anh"
+            - name: DB_PASSWORD
+              value: "S3cur3P@ssw0rd!"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_HOST
+              value: "evershop-postgresdb-postgresql"
